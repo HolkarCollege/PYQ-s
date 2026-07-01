@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Holkar Science College | PYQ Nexus</title>
     
+    <!-- Performance optimizations -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -82,6 +87,8 @@
                 radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
             z-index: -2;
             pointer-events: none;
+            transform: translateZ(0); /* GPU Acceleration */
+            will-change: background-position;
         }
 
         /* Glass UI Components */
@@ -98,6 +105,7 @@
             border: 1px solid rgba(226, 232, 240, 0.8);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            will-change: transform, box-shadow;
         }
         
         .glass-card:active {
@@ -116,6 +124,7 @@
         .stagger-item {
             opacity: 0;
             animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            will-change: opacity, transform;
         }
 
         /* Hide scrollbar but allow scrolling */
@@ -247,7 +256,7 @@
 
         // FULLY RESTRUCTURED DATA TO MATCH THE NEW DIRECTORY PATHS:
         // C:\...\HOLKAR_PYQS_REORGANIZED\Subject\Degree\Year\File.pdf
-        const repoData = {
+        const originalData = {
             "Agriculture": { "BSC": { "2025": ["BSC_S2_Agriculture_2025.pdf"] } },
             "Biochemistry": {
                 "BSC": { "2025": ["BSC_S2_Biochemistry_2025.pdf", "BSC_S4_Biochemistry_2025.pdf", "BSC_S6_Biochemistry_2025.pdf", "BSC_S8_Biochemistry_2025.pdf"] },
@@ -362,19 +371,42 @@
             }
         };
 
+        const repoData = {};
         let searchIndex = [];
-        for (const subject in repoData) {
-            for (const degree in repoData[subject]) {
-                for (const year in repoData[subject][degree]) {
-                    repoData[subject][degree][year].forEach(filename => {
-                        // Extract semester for better display visually (e.g. "Semester 2")
+        
+        // BCA Correction & Search Index Mapping
+        for (const subject in originalData) {
+            for (const degree in originalData[subject]) {
+                for (const year in originalData[subject][degree]) {
+                    const files = originalData[subject][degree][year];
+                    files.forEach(filename => {
+                        const actualPath = `${subject}/${degree}/${year}/${encodeURIComponent(filename)}`;
+                        
+                        // Enforce BCA to be purely under Computer Science
+                        let targetSubject = subject;
+                        if (degree === "BCA") {
+                            targetSubject = "Computer Science";
+                        }
+                        
+                        if (!repoData[targetSubject]) repoData[targetSubject] = {};
+                        if (!repoData[targetSubject][degree]) repoData[targetSubject][degree] = {};
+                        if (!repoData[targetSubject][degree][year]) repoData[targetSubject][degree][year] = [];
+                        
+                        repoData[targetSubject][degree][year].push({
+                            filename: filename,
+                            path: actualPath,
+                            originalSubject: subject
+                        });
+                        
                         const semMatch = filename.match(/_S(\d+)_/);
                         const semester = semMatch ? `Semester ${semMatch[1]}` : 'Paper';
                         
                         searchIndex.push({
-                            subject, degree, year, filename, semester,
-                            path: `${subject}/${degree}/${year}/${encodeURIComponent(filename)}`,
-                            searchStr: `${subject} ${degree} ${year} ${semester}`.toLowerCase()
+                            subject: targetSubject, 
+                            degree, year, filename, semester,
+                            path: actualPath,
+                            originalSubject: subject,
+                            searchStr: `${targetSubject} ${subject} ${degree} ${year} ${semester} ${filename}`.toLowerCase()
                         });
                     });
                 }
@@ -422,6 +454,21 @@
         let currentPath = []; // [Subject, Degree, Year]
         let isSearchMode = false;
 
+        // Initialize History API state
+        history.replaceState({ path: [] }, '', '');
+
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.path) {
+                currentPath = e.state.path;
+            } else {
+                currentPath = [];
+            }
+            isSearchMode = false;
+            DOM.searchInput.value = '';
+            DOM.clearBtn.classList.add('hidden');
+            renderView();
+        });
+
         // DOM elements
         const DOM = {
             grid: document.getElementById('mainGrid'),
@@ -467,6 +514,7 @@
             
             card.onclick = () => {
                 currentPath.push(name);
+                history.pushState({ path: currentPath }, '', '');
                 renderView();
             };
             return card;
@@ -485,7 +533,7 @@
                             ${fileObj.semester}
                         </span>
                         <h3 class="text-base md:text-lg font-bold text-slate-800 leading-snug line-clamp-2" title="${fileObj.filename}">
-                            ${fileObj.subject}
+                            ${fileObj.originalSubject}
                         </h3>
                     </div>
                     <div class="text-red-500 bg-red-50 p-2 rounded-lg ml-2 flex-shrink-0">
@@ -514,6 +562,8 @@
             DOM.grid.innerHTML = '';
             DOM.empty.classList.add('hidden');
 
+            const fragment = document.createDocumentFragment();
+
             // Manage Hero & Back Buttons
             if (currentPath.length > 0 || isSearchMode) {
                 DOM.hero.classList.add('hidden');
@@ -536,8 +586,9 @@
                 if (results.length === 0) {
                     DOM.empty.classList.remove('hidden');
                 } else {
-                    results.forEach((res, i) => DOM.grid.appendChild(createFileCard(res, i)));
+                    results.forEach((res, i) => fragment.appendChild(createFileCard(res, i)));
                 }
+                DOM.grid.appendChild(fragment);
                 return;
             }
 
@@ -571,20 +622,19 @@
                 if (currentNode.length === 0) {
                     DOM.empty.classList.remove('hidden');
                 } else {
-                    currentNode.forEach((filename, i) => {
-                        // Extract semester for nice display
-                        const semMatch = filename.match(/_S(\d+)_/);
+                    currentNode.forEach((fileItem, i) => {
+                        const semMatch = fileItem.filename.match(/_S(\d+)_/);
                         const semester = semMatch ? `Semester ${semMatch[1]}` : 'Paper';
                         
                         const fileObj = {
-                            subject: currentPath[0],
+                            originalSubject: fileItem.originalSubject,
                             degree: currentPath[1],
                             year: currentPath[2],
-                            filename: filename,
+                            filename: fileItem.filename,
                             semester: semester,
-                            path: `${currentPath[0]}/${currentPath[1]}/${currentPath[2]}/${encodeURIComponent(filename)}`
+                            path: fileItem.path
                         };
-                        DOM.grid.appendChild(createFileCard(fileObj, i));
+                        fragment.appendChild(createFileCard(fileObj, i));
                     });
                 }
             } else {
@@ -594,10 +644,11 @@
                     DOM.empty.classList.remove('hidden');
                 } else {
                     keys.forEach((key, i) => {
-                        DOM.grid.appendChild(createFolderCard(key, currentPath.length, i));
+                        fragment.appendChild(createFolderCard(key, currentPath.length, i));
                     });
                 }
             }
+            DOM.grid.appendChild(fragment);
         }
 
         // Search Handlers
@@ -626,10 +677,10 @@
                 isSearchMode = false;
                 DOM.searchInput.value = '';
                 DOM.clearBtn.classList.add('hidden');
+                renderView();
             } else if (currentPath.length > 0) {
-                currentPath.pop();
+                history.back(); // Utilize History API for navigation
             }
-            renderView();
         };
 
         const goHome = (e) => {
@@ -638,6 +689,7 @@
             isSearchMode = false;
             DOM.searchInput.value = '';
             DOM.clearBtn.classList.add('hidden');
+            history.pushState({ path: [] }, '', '');
             renderView();
         };
 
