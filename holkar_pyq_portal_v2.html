@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Holkar Science College | PYQ Nexus</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS (Script based for single-file portability) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        },
+                        accent: {
+                            400: '#f472b6',
+                            500: '#ec4899',
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'float-slow': 'float 8s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 3s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(15px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                        },
+                        pulseGlow: {
+                            '0%': { opacity: '0.4', transform: 'scale(1)' },
+                            '100%': { opacity: '0.8', transform: 'scale(1.05)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Mobile Optimizations & Reset */
+        html, body {
+            overflow-x: hidden;
+            background-color: #f4f7fb;
+            color: #0f172a;
+            -webkit-tap-highlight-color: transparent; /* Remove blue tap highlight on mobile */
+        }
+        
+        /* Premium Background Gradients */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: 
+                radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(236, 72, 153, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Glass UI Components */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+
+        .glass-card {
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .glass-card:active {
+            transform: scale(0.97); /* Haptic feel on mobile tap */
+        }
+
+        @media (min-width: 768px) {
+            .glass-card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                border-color: rgba(59, 130, 246, 0.3);
+            }
+        }
+
+        /* Staggered Grid Animation */
+        .stagger-item {
+            opacity: 0;
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Hide scrollbar but allow scrolling */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Custom Scrollbar for desktop */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Floating Back Button Mobile */
+        .fab {
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative pb-20 md:pb-0">
+
+    <!-- Sticky Header -->
+    <header class="glass-nav sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            
+            <!-- Brand -->
+            <div class="flex items-center justify-between cursor-pointer group" onclick="goHome(event)">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg overflow-hidden relative">
+                        <i class="fa-solid fa-graduation-cap text-xl md:text-2xl z-10"></i>
+                        <div class="absolute inset-0 bg-white/20 opacity-0 group-active:opacity-100 transition-opacity"></div>
+                    </div>
+                    <div class="ml-3">
+                        <h1 class="text-xl md:text-2xl font-display font-bold text-slate-900 leading-tight">PYQ Nexus</h1>
+                        <p class="text-[10px] md:text-xs font-semibold text-brand-600 uppercase tracking-widest">Holkar Science College</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative w-full md:w-96 flex-shrink-0 group">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400 group-focus-within:text-brand-500 transition-colors"></i>
+                </div>
+                <input type="text" id="globalSearch" 
+                    class="w-full bg-slate-100/80 border border-slate-200/60 text-slate-900 text-sm md:text-base rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 block pl-10 pr-10 py-2.5 md:py-3 transition-all" 
+                    placeholder="Search subjects, degrees..." autocomplete="off">
+                <button id="clearSearchBtn" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-red-500">
+                    <i class="fa-solid fa-circle-xmark text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full relative z-10 flex flex-col items-center pt-4 md:pt-8">
+        
+        <!-- Welcome Hero (Dynamic Visibility) -->
+        <div id="heroSection" class="w-full max-w-7xl px-4 sm:px-6 lg:px-8 mb-6 md:mb-12 animate-fade-in-up">
+            <div class="bg-gradient-to-r from-brand-600 to-brand-800 rounded-[2rem] p-6 md:p-12 text-white shadow-2xl shadow-brand-500/20 relative overflow-hidden">
+                <!-- Decorative Elements -->
+                <i class="fa-solid fa-book-open absolute right-[-5%] bottom-[-10%] text-9xl opacity-10 transform rotate-12"></i>
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+                
+                <span class="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase tracking-wider mb-4 border border-white/30">
+                    <i class="fa-solid fa-bolt text-yellow-300 mr-1"></i> New 2025 Database
+                </span>
+                <h2 class="text-3xl md:text-5xl font-display font-bold mb-3 leading-tight">
+                    Find Your Previous <br/> Year Papers Instantly.
+                </h2>
+                <p class="text-brand-100 text-sm md:text-lg max-w-xl font-medium mb-0">
+                    Select your subject below to browse organized resources for BCA, BSC, and MSC courses.
+                </p>
+            </div>
+        </div>
+
+        <!-- Breadcrumbs Navigation Header -->
+        <div class="w-full max-w-7xl px-4 sm:px-6 lg:px-8 mb-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div id="dynamicTitleArea" class="flex flex-col">
+                    <h3 id="viewTitle" class="text-xl md:text-2xl font-display font-bold text-slate-800 flex items-center">
+                        <i class="fa-solid fa-layer-group text-brand-500 mr-2 md:mr-3 text-lg md:text-xl"></i>
+                        Select Subject
+                    </h3>
+                    <p id="viewSubtitle" class="text-xs md:text-sm text-slate-500 font-medium mt-1">Browse all available subjects.</p>
+                </div>
+                
+                <!-- Desktop Back Button -->
+                <button id="desktopBackBtn" class="hidden md:flex items-center px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:text-brand-600 hover:border-brand-300 hover:bg-brand-50 transition-all font-semibold shadow-sm">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Back
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div id="mainGrid" class="w-full max-w-7xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 pb-20">
+            <!-- JS Inject -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden w-full max-w-md mx-auto text-center py-16 px-4">
+            <div class="w-24 h-24 mx-auto bg-slate-100 rounded-full flex items-center justify-center text-slate-400 text-4xl mb-4 shadow-inner">
+                <i class="fa-solid fa-magnifying-glass-minus"></i>
+            </div>
+            <h3 class="text-xl font-display font-bold text-slate-900 mb-2">No results found</h3>
+            <p class="text-slate-500 text-sm">We couldn't find any papers matching your search. Try checking your spelling or navigating manually.</p>
+        </div>
+
+    </main>
+
+    <!-- Mobile Floating Action Back Button -->
+    <button id="mobileBackBtn" class="md:hidden fab hidden fixed bottom-6 right-6 w-14 h-14 bg-slate-900 text-white rounded-full flex items-center justify-center text-xl z-50 active:scale-95 transition-transform">
+        <i class="fa-solid fa-arrow-left"></i>
+    </button>
+
+    <footer class="w-full mt-auto py-6 border-t border-slate-200/60 bg-white/50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-xs md:text-sm text-slate-500 font-medium">
+                &copy; <span id="year"></span> Holkar PYQs. Developed for Students.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // FULLY RESTRUCTURED DATA TO MATCH THE NEW DIRECTORY PATHS:
+        // C:\...\HOLKAR_PYQS_REORGANIZED\Subject\Degree\Year\File.pdf
+        const repoData = {
+            "Agriculture": { "BSC": { "2025": ["BSC_S2_Agriculture_2025.pdf"] } },
+            "Biochemistry": {
+                "BSC": { "2025": ["BSC_S2_Biochemistry_2025.pdf", "BSC_S4_Biochemistry_2025.pdf", "BSC_S6_Biochemistry_2025.pdf", "BSC_S8_Biochemistry_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Biochemistry_2025.pdf", "MSC_S4_Biochemistry_2025.pdf"] }
+            },
+            "Bioinformatics": {
+                "BCA": { "2025": ["BCA_S4_Bioinformatics_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S2_Bioinformatics_2025.pdf", "BSC_S4_Bioinformatics_2025.pdf", "BSC_S6_Bioinformatics_2025.pdf", "BSC_S8_Bioinformatics_2025.pdf"] }
+            },
+            "Biotechnology": {
+                "BSC": { "2025": ["BSC_S2_Biotechnology_2025.pdf", "BSC_S4_Biotechnology_2025.pdf", "BSC_S6_Biotechnology_2025.pdf", "BSC_S8_Biotechnology_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Biotechnology_2025.pdf", "MSC_S4_Biotechnology_2025.pdf"] }
+            },
+            "Botany": {
+                "BCA": { "2025": ["BCA_S2_Botany_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S2_Botany_2025.pdf", "BSC_S4_Botany_2025.pdf", "BSC_S6_Botany_2025.pdf", "BSC_S8_Botany_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Botany_2025.pdf", "MSC_S4_Botany_2025.pdf"] }
+            },
+            "Chemistry": {
+                "BSC": { "2025": ["BSC_S2_Chemistry_2025.pdf", "BSC_S4_Chemistry_2025.pdf", "BSC_S6_Chemistry_2025.pdf", "BSC_S8_Chemistry_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Chemistry_2025.pdf", "MSC_S4_Chemistry_2025.pdf"] }
+            },
+            "Computer Science": {
+                "BCA": { "2025": ["BCA_S2_ComputerScience_2025.pdf", "BCA_S4_ComputerScience_2025.pdf", "BCA_S6_ComputerScience_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S2_ComputerScience_2025.pdf", "BSC_S4_ComputerScience_2025.pdf", "BSC_S6_ComputerScience_2025.pdf", "BSC_S8_ComputerScience_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_ComputerScience_2025.pdf", "MSC_S4_ComputerScience_2025.pdf"] }
+            },
+            "Cyber Security": {
+                "BCA": { "2025": ["BCA_S2_CyberSecurity_2025.pdf", "BCA_S4_CyberSecurity_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S2_CyberSecurity_2025.pdf", "BSC_S4_CyberSecurity_2025.pdf"] }
+            },
+            "Economics": {
+                "BSC": { "2025": ["BSC_S2_Economics_2025.pdf", "BSC_S4_Economics_2025.pdf", "BSC_S6_Economics_2025.pdf", "BSC_S8_Economics_2025.pdf"] }
+            },
+            "Electronics": {
+                "BCA": { "2025": ["BCA_S4_Electronics_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S2_Electronics_2025.pdf", "BSC_S4_Electronics_2025.pdf", "BSC_S6_Electronics_2025.pdf", "BSC_S8_Electronics_2025.pdf"] }
+            },
+            "English": { "BSC": { "2025": ["BSC_S2_English_2025.pdf"] } },
+            "English Language": {
+                "BCA": { "2025": ["BCA_S4_EnglishLanguage_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S4_EnglishLanguage_2025.pdf"] }
+            },
+            "English Language & Indian Culture": { "BSC": { "2025": ["BSC_S2_EnglishLanguageAndIndianCulture_2025.pdf"] } },
+            "Environmental Education": { "BSC": { "2025": ["BSC_S2_EnvironmentalEducation_2025.pdf"] } },
+            "Fisheries": {
+                "BSC": { "2025": ["BSC_S2_Fisheries_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Fisheries_2025.pdf", "MSC_S4_Fisheries_2025.pdf"] }
+            },
+            "Forensic Science": {
+                "BCA": { "2025": ["BCA_S4_ForensicScience_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S2_ForensicScience_2025.pdf", "BSC_S4_ForensicScience_2025.pdf", "BSC_S6_ForensicScience_2025.pdf", "BSC_S8_ForensicScience_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_ForensicScience_2025.pdf", "MSC_S4_ForensicScience_2025.pdf"] }
+            },
+            "Geography": {
+                "BSC": { "2025": ["BSC_S2_Geography_2025.pdf", "BSC_S4_Geography_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Geography_2025.pdf", "MSC_S4_Geography_2025.pdf"] }
+            },
+            "Geology": {
+                "BSC": { "2025": ["BSC_S2_Geology_2025.pdf", "BSC_S4_Geology_2025.pdf", "BSC_S6_Geology_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Geology_2025.pdf", "MSC_S4_Geology_2025.pdf"] }
+            },
+            "Hindi Language": { "BCA": { "2025": ["BCA_S2_HindiLanguage_2025.pdf"] } },
+            "Hindi Language & Indian Culture": { "BSC": { "2025": ["BSC_S2_HindiLanguageAndIndianCulture_2025.pdf"] } },
+            "Horticulture": {
+                "BCA": { "2025": ["BCA_S4_Horticulture_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S2_Horticulture_2025.pdf", "BSC_S4_Horticulture_2025.pdf", "BSC_S6_Horticulture_2025.pdf", "BSC_S8_Horticulture_2025.pdf"] }
+            },
+            "Industrial Fish and Fisheries": { "BSC": { "2025": ["BSC_S4_IndustrialFishandFisheries_2025.pdf", "BSC_S6_IndustrialFishandFisheries_2025.pdf", "BSC_S8_IndustrialFishandFisheries_2025.pdf"] } },
+            "Mathematics": {
+                "BSC": { "2025": ["BSC_S2_Mathematics_2025.pdf", "BSC_S4_Mathematics_2025.pdf", "BSC_S6_Mathematics_2025.pdf", "BSC_S8_Mathematics_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Mathematics_2025.pdf", "MSC_S4_Mathematics_2025.pdf"] }
+            },
+            "Microbiology": {
+                "BSC": { "2025": ["BSC_S2_Microbiology_2025.pdf", "BSC_S4_Microbiology_2025.pdf", "BSC_S6_Microbiology_2025.pdf", "BSC_S8_Microbiology_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Microbiology_2025.pdf", "MSC_S4_Microbiology_2025.pdf"] }
+            },
+            "NCC": {
+                "BCA": { "2025": ["BCA_S2_NCC_2025.pdf", "BCA_S4_NCC_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S2_NCC_2025.pdf", "BSC_S4_NCC_2025.pdf"] }
+            },
+            "NSS": {
+                "BCA": { "2025": ["BCA_S2_NSS_2025.pdf", "BCA_S4_NSS_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S2_NSS_2025.pdf", "BSC_S4_NSS_2025.pdf"] }
+            },
+            "Pharmaceutical  Chemistry": { "MSC": { "2025": ["MSC_S4_PharmaceuticalChemistry_2025.pdf"] } },
+            "Pharmaceutical Chemistry": {
+                "BSC": { "2025": ["BSC_S2_PharmaceuticalChemistry_2025.pdf", "BSC_S4_PharmaceuticalChemistry_2025.pdf", "BSC_S6_PharmaceuticalChemistry_2025.pdf", "BSC_S8_PharmaceuticalChemistry_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_PharmaceuticalChemistry_2025.pdf", "MSC_S4_PharmaceuticalChemistry_2025.pdf"] }
+            },
+            "Physical Education": {
+                "BCA": { "2025": ["BCA_S2_PhysicalEducation_2025.pdf", "BCA_S4_PhysicalEducation_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S2_PhysicalEducation_2025.pdf", "BSC_S4_PhysicalEducation_2025.pdf"] }
+            },
+            "Physics": {
+                "BSC": { "2025": ["BSC_S2_Physics_2025.pdf", "BSC_S4_Physics_2025.pdf", "BSC_S6_Physics_2025.pdf", "BSC_S8_Physics_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Physics_2025.pdf", "MSC_S4_Physics_2025.pdf"] }
+            },
+            "Seed Technology": {
+                "BSC": { "2025": ["BSC_S2_SeedTechnology_2025.pdf", "BSC_S4_SeedTechnology_2025.pdf", "BSC_S6_SeedTechnology_2025.pdf", "BSC_S8_SeedTechnology_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_SeedTechnology_2025.pdf", "MSC_S4_SeedTechnology_2025.pdf"] }
+            },
+            "Statistics": {
+                "BCA": { "2025": ["BCA_S4_Statistics_2025.pdf"] },
+                "BSC": { "2025": ["BSC_S2_Statistics_2025.pdf", "BSC_S4_Statistics_2025.pdf", "BSC_S6_Statistics_2025.pdf", "BSC_S8_Statistics_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Statistics_2025.pdf", "MSC_S4_Statistics_2025.pdf"] }
+            },
+            "Yoga and Meditation": { "BSC": { "2025": ["BSC_S2_YogaandMeditation_2025.pdf"] } },
+            "Zoology": {
+                "BSC": { "2025": ["BSC_S2_Zoology_2025.pdf", "BSC_S4_Zoology_2025.pdf", "BSC_S6_Zoology_2025.pdf", "BSC_S8_Zoology_2025.pdf"] },
+                "MSC": { "2025": ["MSC_S2_Zoology_2025.pdf", "MSC_S4_Zoology_2025.pdf"] }
+            }
+        };
+
+        let searchIndex = [];
+        for (const subject in repoData) {
+            for (const degree in repoData[subject]) {
+                for (const year in repoData[subject][degree]) {
+                    repoData[subject][degree][year].forEach(filename => {
+                        // Extract semester for better display visually (e.g. "Semester 2")
+                        const semMatch = filename.match(/_S(\d+)_/);
+                        const semester = semMatch ? `Semester ${semMatch[1]}` : 'Paper';
+                        
+                        searchIndex.push({
+                            subject, degree, year, filename, semester,
+                            path: `${subject}/${degree}/${year}/${encodeURIComponent(filename)}`,
+                            searchStr: `${subject} ${degree} ${year} ${semester}`.toLowerCase()
+                        });
+                    });
+                }
+            }
+        }
+
+        // Helper: Dynamic Icons for Subjects
+        const subjectIcons = {
+            "Agriculture": "fa-seedling text-green-500",
+            "Biochemistry": "fa-flask text-teal-500",
+            "Bioinformatics": "fa-network-wired text-blue-500",
+            "Biotechnology": "fa-dna text-purple-500",
+            "Botany": "fa-leaf text-emerald-500",
+            "Chemistry": "fa-vial text-cyan-500",
+            "Computer Science": "fa-laptop-code text-indigo-500",
+            "Cyber Security": "fa-shield-halved text-rose-500",
+            "Economics": "fa-chart-line text-amber-500",
+            "Electronics": "fa-microchip text-slate-600",
+            "English": "fa-language text-red-400",
+            "Fisheries": "fa-fish text-sky-500",
+            "Forensic Science": "fa-fingerprint text-slate-700",
+            "Geography": "fa-earth-americas text-green-600",
+            "Geology": "fa-mountain text-stone-500",
+            "Mathematics": "fa-calculator text-blue-600",
+            "Microbiology": "fa-microscope text-violet-500",
+            "NCC": "fa-medal text-yellow-600",
+            "NSS": "fa-hands-holding-child text-orange-500",
+            "Physical Education": "fa-dumbbell text-red-500",
+            "Physics": "fa-atom text-indigo-600",
+            "Zoology": "fa-paw text-orange-400"
+        };
+        
+        function getIconFor(str, type) {
+            if(type === 'degree') return "fa-user-graduate text-brand-500";
+            if(type === 'year') return "fa-calendar-check text-accent-500";
+            
+            // Try partial match for subjects
+            for(let key in subjectIcons) {
+                if(str.includes(key)) return subjectIcons[key];
+            }
+            return "fa-folder-open text-brand-400"; // fallback
+        }
+
+        // State variables
+        let currentPath = []; // [Subject, Degree, Year]
+        let isSearchMode = false;
+
+        // DOM elements
+        const DOM = {
+            grid: document.getElementById('mainGrid'),
+            title: document.getElementById('viewTitle'),
+            subtitle: document.getElementById('viewSubtitle'),
+            deskBack: document.getElementById('desktopBackBtn'),
+            mobBack: document.getElementById('mobileBackBtn'),
+            hero: document.getElementById('heroSection'),
+            empty: document.getElementById('emptyState'),
+            searchInput: document.getElementById('globalSearch'),
+            clearBtn: document.getElementById('clearSearchBtn')
+        };
+
+        function createFolderCard(name, depth, index) {
+            const delay = (index % 10) * 0.05; // Cap stagger delay
+            const iconClass = depth === 0 ? getIconFor(name, 'subject') 
+                            : depth === 1 ? getIconFor(name, 'degree')
+                            : getIconFor(name, 'year');
+            
+            const subtitle = depth === 0 ? "Subject Domain" 
+                           : depth === 1 ? "Degree Program"
+                           : "Academic Year";
+
+            const card = document.createElement('div');
+            // Heavy use of flex and large touch targets for mobile
+            card.className = `glass-card rounded-2xl p-5 cursor-pointer flex items-center justify-between group stagger-item`;
+            card.style.animationDelay = `${delay}s`;
+            
+            card.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-xl md:text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                        <i class="fa-solid ${iconClass}"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg md:text-xl font-bold text-slate-800 tracking-tight leading-tight group-hover:text-brand-600 transition-colors">${name}</h3>
+                        <p class="text-xs font-semibold text-slate-400 mt-0.5">${subtitle}</p>
+                    </div>
+                </div>
+                <div class="text-slate-300 group-hover:text-brand-500 group-hover:translate-x-1 transition-all">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+            `;
+            
+            card.onclick = () => {
+                currentPath.push(name);
+                renderView();
+            };
+            return card;
+        }
+
+        function createFileCard(fileObj, index) {
+            const delay = (index % 10) * 0.05;
+            const card = document.createElement('div');
+            card.className = `glass-card rounded-2xl overflow-hidden flex flex-col h-full stagger-item`;
+            card.style.animationDelay = `${delay}s`;
+            
+            card.innerHTML = `
+                <div class="bg-slate-50 border-b border-slate-100 px-5 py-4 flex items-start justify-between">
+                    <div>
+                        <span class="inline-block px-2.5 py-1 rounded-md bg-brand-100 text-brand-700 text-[10px] font-extrabold tracking-wider uppercase mb-2">
+                            ${fileObj.semester}
+                        </span>
+                        <h3 class="text-base md:text-lg font-bold text-slate-800 leading-snug line-clamp-2" title="${fileObj.filename}">
+                            ${fileObj.subject}
+                        </h3>
+                    </div>
+                    <div class="text-red-500 bg-red-50 p-2 rounded-lg ml-2 flex-shrink-0">
+                        <i class="fa-solid fa-file-pdf text-xl"></i>
+                    </div>
+                </div>
+                <div class="px-5 py-3 bg-white flex-grow">
+                    <div class="flex items-center text-xs text-slate-500 font-medium space-x-3 mb-2">
+                        <span class="flex items-center"><i class="fa-solid fa-user-graduate mr-1.5 opacity-70"></i> ${fileObj.degree}</span>
+                        <span class="flex items-center"><i class="fa-solid fa-calendar mr-1.5 opacity-70"></i> ${fileObj.year}</span>
+                    </div>
+                </div>
+                <div class="p-3 border-t border-slate-100 bg-slate-50/50 flex space-x-2">
+                    <a href="${fileObj.path}" target="_blank" class="flex-1 flex justify-center items-center py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-100 hover:text-brand-600 transition-colors shadow-sm">
+                        <i class="fa-solid fa-eye mr-2"></i> View
+                    </a>
+                    <a href="${fileObj.path}" download class="flex-1 flex justify-center items-center py-2.5 rounded-xl bg-brand-600 text-white font-bold text-sm hover:bg-brand-700 transition-colors shadow-md shadow-brand-500/20">
+                        <i class="fa-solid fa-download mr-2"></i> Save
+                    </a>
+                </div>
+            `;
+            return card;
+        }
+
+        function renderView() {
+            DOM.grid.innerHTML = '';
+            DOM.empty.classList.add('hidden');
+
+            // Manage Hero & Back Buttons
+            if (currentPath.length > 0 || isSearchMode) {
+                DOM.hero.classList.add('hidden');
+                DOM.deskBack.classList.remove('hidden');
+                DOM.mobBack.classList.remove('hidden');
+            } else {
+                DOM.hero.classList.remove('hidden');
+                DOM.deskBack.classList.add('hidden');
+                DOM.mobBack.classList.add('hidden');
+            }
+
+            // Render Search Results
+            if (isSearchMode) {
+                const query = DOM.searchInput.value.toLowerCase().trim();
+                const results = searchIndex.filter(item => item.searchStr.includes(query));
+                
+                DOM.title.innerHTML = `<i class="fa-solid fa-magnifying-glass text-brand-500 mr-2"></i> Search Results`;
+                DOM.subtitle.textContent = `Found ${results.length} papers matching "${query}"`;
+                
+                if (results.length === 0) {
+                    DOM.empty.classList.remove('hidden');
+                } else {
+                    results.forEach((res, i) => DOM.grid.appendChild(createFileCard(res, i)));
+                }
+                return;
+            }
+
+            // Normal Navigation Logic
+            let currentNode = repoData;
+            for (const seg of currentPath) currentNode = currentNode[seg];
+
+            if (!currentNode) {
+                DOM.empty.classList.remove('hidden');
+                return;
+            }
+
+            // Update Headers contextually
+            if (currentPath.length === 0) {
+                DOM.title.innerHTML = `<i class="fa-solid fa-layer-group text-brand-500 mr-2 md:mr-3 text-lg md:text-xl"></i> Select Subject`;
+                DOM.subtitle.textContent = "Browse all available subjects.";
+            } else if (currentPath.length === 1) {
+                DOM.title.innerHTML = `<span class="text-slate-400 font-normal mr-2">Subject /</span> ${currentPath[0]}`;
+                DOM.subtitle.textContent = "Select your degree program.";
+            } else if (currentPath.length === 2) {
+                DOM.title.innerHTML = `<span class="text-slate-400 font-normal mr-2">${currentPath[0]} /</span> ${currentPath[1]}`;
+                DOM.subtitle.textContent = "Select the examination year.";
+            } else if (currentPath.length === 3) {
+                DOM.title.innerHTML = `<span class="text-slate-400 font-normal mr-2">${currentPath[1]} /</span> Papers`;
+                DOM.subtitle.textContent = `Available question papers for ${currentPath[0]} (${currentPath[2]}).`;
+            }
+
+            // Render Node contents
+            if (Array.isArray(currentNode)) {
+                // We reached the files array
+                if (currentNode.length === 0) {
+                    DOM.empty.classList.remove('hidden');
+                } else {
+                    currentNode.forEach((filename, i) => {
+                        // Extract semester for nice display
+                        const semMatch = filename.match(/_S(\d+)_/);
+                        const semester = semMatch ? `Semester ${semMatch[1]}` : 'Paper';
+                        
+                        const fileObj = {
+                            subject: currentPath[0],
+                            degree: currentPath[1],
+                            year: currentPath[2],
+                            filename: filename,
+                            semester: semester,
+                            path: `${currentPath[0]}/${currentPath[1]}/${currentPath[2]}/${encodeURIComponent(filename)}`
+                        };
+                        DOM.grid.appendChild(createFileCard(fileObj, i));
+                    });
+                }
+            } else {
+                // We are at a folder level
+                const keys = Object.keys(currentNode).sort();
+                if(keys.length === 0) {
+                    DOM.empty.classList.remove('hidden');
+                } else {
+                    keys.forEach((key, i) => {
+                        DOM.grid.appendChild(createFolderCard(key, currentPath.length, i));
+                    });
+                }
+            }
+        }
+
+        // Search Handlers
+        DOM.searchInput.addEventListener('input', (e) => {
+            const val = e.target.value;
+            if (val.trim().length > 0) {
+                isSearchMode = true;
+                DOM.clearBtn.classList.remove('hidden');
+            } else {
+                isSearchMode = false;
+                DOM.clearBtn.classList.add('hidden');
+            }
+            renderView();
+        });
+
+        DOM.clearBtn.addEventListener('click', () => {
+            isSearchMode = false;
+            DOM.searchInput.value = '';
+            DOM.clearBtn.classList.add('hidden');
+            renderView();
+        });
+
+        // Navigation Handlers
+        const goBack = () => {
+            if (isSearchMode) {
+                isSearchMode = false;
+                DOM.searchInput.value = '';
+                DOM.clearBtn.classList.add('hidden');
+            } else if (currentPath.length > 0) {
+                currentPath.pop();
+            }
+            renderView();
+        };
+
+        const goHome = (e) => {
+            if(e) e.preventDefault();
+            currentPath = [];
+            isSearchMode = false;
+            DOM.searchInput.value = '';
+            DOM.clearBtn.classList.add('hidden');
+            renderView();
+        };
+
+        DOM.deskBack.addEventListener('click', goBack);
+        DOM.mobBack.addEventListener('click', goBack);
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            renderView();
+        });
+
+    </script>
+</body>
+</html>
